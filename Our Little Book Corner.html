@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Little Book Corner</title>
+<style>
+/* two frames side by side: list on the left, details on the right */
+html,body{height:100%;margin:0}
+body{background:linear-gradient(135deg,#f7d9b8,#f3c7a4 45%,#e8b9a0);font-family:Georgia,"Times New Roman",serif;color:#3a2f26;display:flex;flex-direction:column}
+header{background:linear-gradient(90deg,#3d4f5c,#6b4a5e 60%,#9b5a4a);color:#f5ecdc;padding:10px 18px;border-bottom:4px solid #a8744a}
+header h1{margin:0;font-size:1.3rem;font-weight:normal;letter-spacing:.5px}
+header small{color:#d9c7a8;font-style:italic}
+#frames{flex:1;display:flex;min-height:0}
+iframe{border:0;height:100%}
+#left{width:260px;border-right:3px double #a8744a;background:#d3ebdc}
+#right{flex:1;background:#fff3d6}
+@media (max-width:640px){
+  #frames{flex-direction:column}
+  #left{width:100%;height:38%;border-right:0;border-bottom:3px double #a8744a}
+  #right{height:62%}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Our Little Book Corner</h1>
+  <small>pick a book on the left, read about it on the right</small>
+</header>
+
+<div id="frames">
+  <iframe id="left" title="Book list"></iframe>
+  <iframe id="right" name="info" title="Book information"></iframe>
+</div>
+
+<script>
+// the books. I just typed these in by hand, add more whenever you like
+var books = [
+  { id:1, title:"Pride and Prejudice", author:"Jane Austen", year:1813, genre:"Classic romance", pages:432,
+    about:"Elizabeth Bennet is clever, stubborn and not at all impressed by the rich Mr. Darcy. He is not impressed by her family either. It takes a lot of misunderstanding (and one very bad letter) before they work each other out.",
+    note:"Read it for the dialogue, it is still funny two hundred years later." },
+  { id:2, title:"To Kill a Mockingbird", author:"Harper Lee", year:1960, genre:"Southern fiction", pages:336,
+    about:"Told by Scout Finch, a young girl in Alabama in the 1930s, whose father defends a Black man wrongly accused of a crime. It is about growing up, and about seeing people the way they really are.",
+    note:"Quiet, sad and very kind in places." },
+  { id:3, title:"The Hobbit", author:"J.R.R. Tolkien", year:1937, genre:"Fantasy", pages:310,
+    about:"Bilbo Baggins likes his armchair and his tea. Then a wizard and thirteen dwarves turn up and he ends up walking to a mountain to steal treasure from a dragon.",
+    note:"A good first fantasy book, easier than The Lord of the Rings." },
+  { id:4, title:"1984", author:"George Orwell", year:1949, genre:"Dystopian", pages:328,
+    about:"Winston Smith works for the Party, which watches everything and rewrites history whenever it wants. He starts a diary, which is of course against the rules.",
+    note:"Not a cheerful read, but the ideas have stayed with a lot of people." },
+  { id:5, title:"The Alchemist", author:"Paulo Coelho", year:1988, genre:"Adventure / fable", pages:208,
+    about:"A shepherd boy in Spain dreams of treasure near the Egyptian pyramids and sets off to find it. Along the way he meets people who teach him about following your own path.",
+    note:"Short and simple. Some people love it, some find it too preachy." },
+  { id:6, title:"Wings of Fire", author:"A.P.J. Abdul Kalam", year:1999, genre:"Autobiography", pages:180,
+    about:"The life story of the former President of India, from a childhood in Rameswaram to his work on rockets and missiles at ISRO and DRDO.",
+    note:"Good for students, it is very encouraging." }
+];
+
+/* ---- left frame: the list ---- */
+var items = books.map(function(b){
+  return '<li><a href="#" data-id="'+b.id+'">'+b.title+'</a><br><span>'+b.author+'</span></li>';
+}).join("");
+
+var leftPage =
+ '<!DOCTYPE html><html><head><meta charset="utf-8"><style>'+
+ 'body{margin:0;padding:14px 16px;font-family:Georgia,serif;color:#3a2f26;background:linear-gradient(#d9efe2,#c2e1d2)}'+
+ 'h2{font-size:1.05rem;margin:0 0 10px;border-bottom:1px solid #c9b79a;padding-bottom:6px}'+
+ 'ul{list-style:none;margin:0;padding:0}'+
+ 'li{padding:8px 6px;border-bottom:1px dotted #c9b79a;line-height:1.3}'+
+ 'li span{font-size:.85rem;color:#7b6a58;font-style:italic}'+
+ 'a{color:#6b3f1d;text-decoration:none;font-weight:bold}'+
+ 'a:hover,a:focus{text-decoration:underline;color:#a8744a}'+
+ 'li.on{background:#a9d6bd}'+
+ '</style></head><body><h2>Books ('+books.length+')</h2><ul>'+items+'</ul>'+
+ '<script>'+
+ 'document.addEventListener("click",function(e){'+
+ ' var a=e.target.closest("a"); if(!a) return; e.preventDefault();'+
+ ' document.querySelectorAll("li").forEach(function(l){l.className=""});'+
+ ' a.parentNode.className="on";'+
+ ' parent.postMessage({book:+a.getAttribute("data-id")},"*");'+
+ '});'+
+ '<\/script></body></html>';
+
+/* ---- right frame: details ---- */
+var css =
+ 'body{margin:0;padding:24px 28px;font-family:Georgia,serif;color:#3a2f26;background:linear-gradient(#fff6dc,#ffe6c4);line-height:1.6;max-width:640px}'+
+ 'h1{margin:0 0 2px;font-size:1.8rem}'+
+ '.by{margin:0 0 18px;color:#7b6a58;font-style:italic}'+
+ 'table{border-collapse:collapse;margin-bottom:18px}'+
+ 'td{padding:5px 18px 5px 0;vertical-align:top}'+
+ 'td:first-child{color:#7b6a58}'+
+ 'blockquote{margin:16px 0 0;padding:6px 14px;border-left:4px solid #a8744a;background:#ffd9a0}';
+
+function frame(body){
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>'+css+'</style></head><body>'+body+'</body></html>';
+}
+
+var welcome = frame('<h1>Welcome!</h1><p>This is a small collection of books I like (and a few I think everyone should try).</p><p>Click a title in the list on the left and its details will show up here.</p>');
+
+function showBook(id){
+  var b = books.filter(function(x){return x.id===id})[0];
+  if(!b) return;
+  document.getElementById("right").srcdoc = frame(
+    '<h1>'+b.title+'</h1><p class="by">by '+b.author+'</p>'+
+    '<table><tr><td>Year</td><td>'+b.year+'</td></tr>'+
+    '<tr><td>Genre</td><td>'+b.genre+'</td></tr>'+
+    '<tr><td>Pages</td><td>'+b.pages+'</td></tr></table>'+
+    '<p>'+b.about+'</p><blockquote>'+b.note+'</blockquote>');
+}
+
+window.addEventListener("message", function(e){
+  if(e.data && typeof e.data.book === "number") showBook(e.data.book);
+});
+
+document.getElementById("left").srcdoc = leftPage;
+document.getElementById("right").srcdoc = welcome;
+</script>
+</body>
+</html>
